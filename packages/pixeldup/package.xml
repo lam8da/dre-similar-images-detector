@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<package>
+	<information>
+		<key>jp.thisnor.dre.pixeldup</key>
+		<name>Pixel Duplication</name>
+		<version>1.1.1</version>
+		<author>jp.thisnor</author>
+		<caption>!CAPTION!</caption>
+		<description>!DESCRIPTION!</description>
+	</information>
+	<locale>
+		<lang>jp.thisnor.dre.pixeldup.lang</lang>
+	</locale>
+	<class>
+		<measurer>jp.thisnor.dre.pixeldup.PixelDupMeasurer</measurer>
+	</class>
+	<options>
+		<option>
+			<key>hashAlgorithm</key>
+			<name>!OPTION_HASHALGORITHM!</name>
+			<select>
+				<value>MD5</value>
+				<value>SHA-1</value>
+				<value>SHA-256</value>
+			</select>
+			<default>MD5</default>
+		</option>
+		<option>
+			<key>useCache</key>
+			<name>!OPTION_USECACHE!</name>
+			<select>
+				<value>!OPTION_USECACHE_TRUE!</value>
+				<value>!OPTION_USECACHE_FALSE!</value>
+			</select>
+			<default>!OPTION_USECACHE_TRUE!</default>
+		</option>
+		<option type="hidden">
+			<key>threshold</key>
+			<name></name>
+			<default>0</default>
+		</option>
+	</options>
+</package>
