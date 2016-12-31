@@ -7,7 +7,7 @@
   <property name="source" value="1.6"/>
   <path id="DeadRingerEraser2011.classpath">
     <pathelement location="bin"/>
-    <!--<pathelement location="packages/bindupsample"/>-->
+    <pathelement location="packages/bindupsample"/>
     <pathelement location="packages/bindup"/>
     <pathelement location="packages/lls"/>
     <pathelement location="packages/pixeldup"/>
@@ -16,12 +16,12 @@
     <pathelement location="lib/org.eclipse.jface_3.6.1.M20100825-0800.jar"/>
     <pathelement location="lib/antlr-runtime-3.1.3.jar"/>
     <pathelement location="lib/sqlite-jdbc-3.6.20.1.jar"/>
-    <!--<pathelement location="lib/swt-3.7.1-win32-win32-x86.jar"/>-->
-    <!--<pathelement location="lib/swt-3.7.1-win32-win32-x86_64.jar"/>-->
-    <!--<pathelement location="lib/swt-3.7.1-cocoa-macosx.jar"/>-->
+    <pathelement location="lib/swt-3.7.1-win32-win32-x86.jar"/>
+    <pathelement location="lib/swt-3.7.1-win32-win32-x86_64.jar"/>
+    <pathelement location="lib/swt-3.7.1-cocoa-macosx.jar"/>
     <pathelement location="lib/swt-3.7.1-cocoa-macosx-x86_64.jar"/>
-    <!--<pathelement location="lib/swt-3.7.1-gtk-linux-x86.jar"/>-->
-    <!--<pathelement location="lib/swt-3.7.1-gtk-linux-x86_64.jar"/>-->
+    <pathelement location="lib/swt-3.7.1-gtk-linux-x86.jar"/>
+    <pathelement location="lib/swt-3.7.1-gtk-linux-x86_64.jar"/>
   </path>
   <target name="build-core">
     <mkdir dir="bin"/>
@@ -117,17 +117,9 @@
   </target>
   <target name="make-macosx-distribution" depends="make-common-distribution">
     <mkdir dir="distribution/dre-${version}-macosx"/>
-    <!--
-    <copy todir="distribution/dre-${version}-macosx">
-      <fileset dir="distribution/common"/>
-    </copy>
-    <copy todir="distribution/dre-${version}-macosx">
-      <fileset dir="distribution/common-macosx"/>
-    </copy>
-    -->
     <copy todir="distribution/dre-${version}-macosx/lib">
       <fileset dir="lib-common"/>
-      <fileset dir="lib-win32"/>
+      <fileset dir="lib-macosx"/>
     </copy>
     <copy todir="distribution/dre-${version}-macosx">
       <fileset dir="distribution/dre-${version}-common"/>
@@ -145,19 +137,9 @@
   </target>
   <target name="make-linux-distribution" depends="make-common-distribution">
     <mkdir dir="distribution/dre-${version}-linux"/>
-    <!--
-    <copy todir="distribution/dre-${version}-linux">
-      <fileset dir="distribution/common"/>
-    </copy>
-    <copy todir="distribution/dre-${version}-linux">
-      <fileset dir="distribution/common-linux"/>
-    </copy>
-    -->
-    <copy todir="distribution/dre-${version}-macosx/lib">
-      <fileset dir="lib">
-        <exclude name="*macosx*"/>
-        <exclude name="*win32*"/>
-      </fileset>
+    <copy todir="distribution/dre-${version}-linux/lib">
+      <fileset dir="lib-common"/>
+      <fileset dir="lib-linux"/>
     </copy>
     <copy todir="distribution/dre-${version}-linux">
       <fileset dir="distribution/dre-${version}-common"/>
@@ -182,6 +164,7 @@
     <zip destfile="distribution/dre-${version}-win32.zip" basedir="distribution/dre-${version}-win32"/>
     <zip destfile="distribution/dre-${version}-macosx.zip" basedir="distribution/dre-${version}-macosx"/>
     <zip destfile="distribution/dre-${version}-linux.zip" basedir="distribution/dre-${version}-linux"/>
+    <tar destfile="distribution/dre-${version}-win32.tar.gz" basedir="distribution/dre-${version}-win32" compression="gzip"/>
     <tar destfile="distribution/dre-${version}-macosx.tar.gz" basedir="distribution/dre-${version}-macosx" compression="gzip"/>
     <tar destfile="distribution/dre-${version}-linux.tar.gz" basedir="distribution/dre-${version}-linux" compression="gzip"/>
   </target>
