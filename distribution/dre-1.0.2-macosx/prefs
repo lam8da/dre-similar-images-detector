@@ -1,0 +1,10 @@
+#Sat Dec 31 14:42:41 PST 2016
+jp.thisnor.dre.pixeldup.threshold=0
+jp.thisnor.dre.app.FileEntrySelectPage.target.files=/Users/laigd/pkgconfig//
+jp.thisnor.dre.core.PackageSelectPage.selectedpackage=jp.thisnor.dre.bindup
+jp.thisnor.dre.lls.distType=Euclidean
+jp.thisnor.dre.lls.useCache=true
+jp.thisnor.dre.bindup.threshold=0
+jp.thisnor.dre.pixeldup.hashAlgorithm=SHA-256
+jp.thisnor.dre.lls.threshold=100
+jp.thisnor.dre.pixeldup.useCache=true
