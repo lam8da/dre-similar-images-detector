@@ -1,9 +1,9 @@
 package jp.thisnor.dre.bindup;
 
 class BinDupData {
-	final byte[] buffer;
+  final byte[] buffer;
 
-	BinDupData(byte[] buffer) {
-		this.buffer = buffer;
-	}
+  BinDupData(byte[] buffer) {
+    this.buffer = buffer;
+  }
 }

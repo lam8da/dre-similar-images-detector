@@ -23,7 +23,7 @@
 				<value>SHA-1</value>
 				<value>SHA-256</value>
 			</select>
-			<default>MD5</default>
+			<default>SHA-256</default>
 		</option>
 		<option>
 			<key>useCache</key>
