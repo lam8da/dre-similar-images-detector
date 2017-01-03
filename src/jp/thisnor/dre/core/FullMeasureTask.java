@@ -41,6 +41,11 @@ public class FullMeasureTask implements Runnable {
       MeasureEntry stEntry;
       List<SimilarEntry> simList = null;
       int index2 = index + 1;
+      // Distance of single pixel satisfied triangle inequality:
+      // https://en.wikipedia.org/wiki/Triangle_inequality
+      // so thus sum of distance of all pixels.
+      // TODO(laigd): fix distance definition of bindu and pixeldup so the
+      // distance is either 0 or 1.
       while (index2 < storageList.size()
           && (stEntry = storageList.get(index2)).firstDistance
               <= tarEntry.firstDistance + threshold) {

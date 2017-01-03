@@ -23,7 +23,9 @@ public class SimilarGroup {
         }
       };
 
+  // This is always a target file entry, not a storage file entry (source)
   private final FileEntry fileEntry;
+  // These are always storage file entries (source), not targets
   private final List<SimilarEntry> similarList;
 
   public SimilarGroup(FileEntry fileEntry, List<SimilarEntry> similarList) {

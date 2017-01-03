@@ -3,8 +3,8 @@
   <property name="version" value="1.0.2"/>
   <property environment="env"/>
   <property name="debuglevel" value="source,lines,vars"/>
-  <property name="target" value="1.6"/>
-  <property name="source" value="1.6"/>
+  <property name="target" value="1.7"/>
+  <property name="source" value="1.7"/>
   <path id="DeadRingerEraser2011.classpath">
     <pathelement location="bin"/>
     <pathelement location="packages/bindupsample"/>
@@ -101,9 +101,9 @@
       <fileset dir="lib-common"/>
       <fileset dir="lib-win32"/>
     </copy>
-    <copy todir="distribution/dre-${version}-win32">
+    <move todir="distribution/dre-${version}-win32">
       <fileset dir="distribution/dre-${version}-common"/>
-    </copy>
+    </move>
     <jar destfile="distribution/dre-${version}-win32/dre.app.win32.x86.jar" manifest="manifest/dre.app.win32.x86.manifest">
       <fileset dir="bin" includes="jp/thisnor/dre/app/**"/>
       <fileset dir="." includes="res/icon/**"/>
@@ -121,9 +121,9 @@
       <fileset dir="lib-common"/>
       <fileset dir="lib-macosx"/>
     </copy>
-    <copy todir="distribution/dre-${version}-macosx">
+    <move todir="distribution/dre-${version}-macosx">
       <fileset dir="distribution/dre-${version}-common"/>
-    </copy>
+    </move>
     <jar destfile="distribution/dre-${version}-macosx/dre.app.macosx.x86.jar" manifest="manifest/dre.app.macosx.x86.manifest">
       <fileset dir="bin" includes="jp/thisnor/dre/app/**"/>
       <fileset dir="." includes="res/icon/**"/>
@@ -141,9 +141,9 @@
       <fileset dir="lib-common"/>
       <fileset dir="lib-linux"/>
     </copy>
-    <copy todir="distribution/dre-${version}-linux">
+    <move todir="distribution/dre-${version}-linux">
       <fileset dir="distribution/dre-${version}-common"/>
-    </copy>
+    </move>
     <jar destfile="distribution/dre-${version}-linux/dre.app.linux.x86.jar" manifest="manifest/dre.app.linux.x86.manifest">
       <fileset dir="bin" includes="jp/thisnor/dre/app/**"/>
       <fileset dir="." includes="res/icon/**"/>

@@ -174,6 +174,18 @@ class SimilarEntrySelectPage extends DREPage {
     return checkedFileSet;
   }
 
+  void deselectEntryIfNecessary() {
+    // If all entries in a group are selected, deselect a random one.
+nextGroup:
+    for (final SimilarGroup simGroup : simGroupList) {
+      if (!checkedFileSet.contains(simGroup.getFileEntry())) continue;
+      for (SimilarEntry similar : simGroup.getSimilarList()) {
+        if (!checkedFileSet.contains(similar.getFileEntry())) continue nextGroup;
+      }
+      checkedFileSet.remove(simGroup.getFileEntry());
+    }
+  }
+
   void setFileChecked(Set<FileEntry> fileEntrySet, int mode) {
     switch (mode) {
       case 0: // check off
@@ -192,6 +204,7 @@ class SimilarEntrySelectPage extends DREPage {
         }
         break;
     }
+    deselectEntryIfNecessary();
     updateFileTableCheckState();
     updateSimilarTableCheckState();
   }
@@ -202,6 +215,7 @@ class SimilarEntrySelectPage extends DREPage {
     } else {
       checkedFileSet.remove(file);
     }
+    deselectEntryIfNecessary();
     updateFileTableCheckState();
     updateSimilarTableCheckState();
   }
@@ -279,6 +293,7 @@ class SimilarEntrySelectPage extends DREPage {
     fileEntryTable.removeAll();
     similarEntryTable.removeAll();
     previewer.setFileEntry(null);
+    checkerViewer.updateContentsEnabled();
     checkedFileSet.clear();
 
     fileEntryLabel.setText(

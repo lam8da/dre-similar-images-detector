@@ -59,6 +59,7 @@ class StorageEntrySelecter implements EntrySelecter {
   }
 }
 
+// Pick one entry from each group
 class PickOneEntrySelecter implements EntrySelecter {
   static final PickOneEntrySelecter INSTANCE = new PickOneEntrySelecter();
 

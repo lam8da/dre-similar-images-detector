@@ -241,9 +241,17 @@ class DREFrame {
       buttonBar.setLayoutData(fd);
     }
 
-    for (DREPage page : pageMap.values()) {
-      page.createContents(contentComp);
-    }
+    // for (DREPage page : pageMap.values()) {
+    //   page.createContents(contentComp);
+    // }
+    // Initialization order matters here, as there may be dependences between
+    // pages.
+    getPage(FileEntrySelectPage.class).createContents(contentComp);
+    getPage(PackageSelectPage.class).createContents(contentComp);
+    getPage(MeasureExecutePage.class).createContents(contentComp);
+    getPage(SimilarEntrySelectPage.class).createContents(contentComp);
+    getPage(DisposeWaySelectPage.class).createContents(contentComp);
+    getPage(DisposeExecutePage.class).createContents(contentComp);
   }
 
   Shell getShell() {

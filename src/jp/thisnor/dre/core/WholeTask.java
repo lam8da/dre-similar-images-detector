@@ -50,14 +50,18 @@ public class WholeTask implements Callable<List<SimilarGroup>> {
     Messages messages =
         new Messages("jp.thisnor.dre.core.lang", locale, this.getClass().getClassLoader());
 
-    if (mpack == null)
+    if (mpack == null) {
       throw new DREException(messages.getString("WholeTask.MEASURER_NOT_SPECIFIED"));
-    if (targetList == null) throw new DREException(messages.getString("WholeTask.NO_TARGET"));
-    if (storageList == null) throw new DREException(messages.getString("WholeTask.NO_STORAGE"));
-    if (numThreads <= 0)
+    }
+    if (targetList == null) {
+      throw new DREException(messages.getString("WholeTask.NO_TARGET"));
+    }
+    if (storageList == null) {
+      throw new DREException(messages.getString("WholeTask.NO_STORAGE"));
+    }
+    if (numThreads <= 0) {
       throw new IllegalArgumentException(messages.getString("WholeTask.ILLEGAL_NUM_THREADS"));
-
-    Measurer measurer = mpack.getHandler();
+    }
 
     ExecutorService executor;
     SynchronizedCounter counter;
@@ -105,46 +109,36 @@ public class WholeTask implements Callable<List<SimilarGroup>> {
     }
 
     // Init
+    Measurer measurer = mpack.getHandler();
     measurer.init(mpack);
 
     // Load
-    int fullFileCount =
+    int currentFileCount = 0;
+    int currentCountBase = 0;
+    final int fullFileCount =
         targetEntryList.size()
             + (targetEntryList.size() == storageEntryList.size() ? 0 : storageEntryList.size());
-    {
+    List<MeasureEntry> list = targetEntryList;
+    while (true) {
+      currentFileCount += list.size();
       executor = Executors.newFixedThreadPool(numThreads);
       counter = new SynchronizedCounter();
       for (int i = 0; i < numThreads; i++) {
-        executor.submit(new LoadTask(targetEntryList, measurer, counter, logger));
+        executor.submit(new LoadTask(list, measurer, counter, logger));
       }
       executor.shutdown();
       try {
         while (!executor.awaitTermination(100, TimeUnit.MILLISECONDS)) {
           logger.progressLoad(
-              Math.min(counter.currentValue(), targetEntryList.size()), fullFileCount);
+              Math.min(currentCountBase + counter.currentValue(), currentFileCount), fullFileCount);
         }
       } catch (InterruptedException e) {
         executor.shutdownNow();
         throw e;
       }
-    }
-    if (targetEntryList != storageEntryList) {
-      executor = Executors.newFixedThreadPool(numThreads);
-      counter = new SynchronizedCounter();
-      for (int i = 0; i < numThreads; i++) {
-        executor.submit(new LoadTask(storageEntryList, measurer, counter, logger));
-      }
-      executor.shutdown();
-      try {
-        while (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-          logger.progressLoad(
-              Math.min(targetEntryList.size() + counter.currentValue(), fullFileCount),
-              fullFileCount);
-        }
-      } catch (InterruptedException e) {
-        executor.shutdownNow();
-        throw e;
-      }
+      if (list == storageEntryList) break;
+      list = storageEntryList;
+      currentCountBase = currentFileCount;
     }
     logger.progressLoad(1, 1);
 
@@ -197,11 +191,12 @@ public class WholeTask implements Callable<List<SimilarGroup>> {
 
     // Sort
     Collections.sort(targetEntryList, MEASURE_ENTRY_COMPARATOR);
-    if (targetEntryList != storageEntryList)
+    if (targetEntryList != storageEntryList) {
       Collections.sort(storageEntryList, MEASURE_ENTRY_COMPARATOR);
+    }
 
     // Full-measure
-    int threshold =
+    final int threshold =
         mpack.getOptionMap().containsKey("threshold")
             ? Integer.parseInt(mpack.getOptionMap().get("threshold").getValue())
             : Integer.MAX_VALUE;

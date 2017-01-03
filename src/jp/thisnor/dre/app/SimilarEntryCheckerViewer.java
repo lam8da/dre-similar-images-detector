@@ -90,7 +90,7 @@ class SimilarEntryCheckerViewer {
 
   void createContents(Composite parent) {
     PreferenceStore prefs = frame.getPreferences();
-    prefs.setDefault(PREFS_COND_KEY, 0);
+    prefs.setDefault(PREFS_COND_KEY, 3);
     prefs.setDefault(PREFS_FILENAME_KEY, 0);
     prefs.setDefault(PREFS_COMPRESS_KEY, 0);
     prefs.setDefault(PREFS_SIZE_KEY, 0);
@@ -139,6 +139,11 @@ class SimilarEntryCheckerViewer {
       Composite condItemComp = new Composite(condComp, SWT.NONE);
       condItemComp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       switch (i) {
+        case 0:
+          // Always disable the 'All' checking button to prevent user from
+          // accidentially remove all images.
+          condRadios[0].setEnabled(false);
+          break;
         case 4:
           Group filenameGroup = new Group(condItemComp, SWT.NONE);
           filenameGroup.setLayout(createSpacedHorizontalLayout());
@@ -285,7 +290,30 @@ class SimilarEntryCheckerViewer {
     prefs.setValue(PREFS_CHECK_KEY, getSelectedCheck());
   }
 
+  void updateTargetStorageRadiosEnabled() {
+    // This is just an optimization so if user use same set of files as both
+    // source and target, we disable the source/target checking button, as it
+    // means checking everything.
+    boolean sameTarget = false;
+    FileEntrySelectPage fileSelectPage = frame.getPage(FileEntrySelectPage.class);
+    List<String> targetFileList = fileSelectPage.getExtTargetFileList();
+    List<String> storageFileList = fileSelectPage.getExtStorageFileList();
+    if (targetFileList == storageFileList) {
+      sameTarget = true;
+    } else if (targetFileList != null && storageFileList != null) {
+      final Set<String> s1 = new HashSet<>(targetFileList);
+      final Set<String> s2 = new HashSet<>(storageFileList);
+      if (s1.equals(s2)) sameTarget = true;
+    }
+    condRadios[1].setEnabled(!sameTarget);
+    condRadios[2].setEnabled(!sameTarget);
+    if (sameTarget && (condRadios[1].getSelection() || condRadios[2].getSelection())) {
+      condRadios[3].setSelection(true);
+    }
+  }
+
   void updateContentsEnabled() {
+    updateTargetStorageRadiosEnabled();
     for (Button b : filenameRadios) b.setEnabled(condRadios[4].getSelection());
     for (Button b : compressRadios) b.setEnabled(condRadios[5].getSelection());
     for (Button b : sizeRadios) b.setEnabled(condRadios[6].getSelection());
@@ -381,69 +409,72 @@ class SimilarEntryCheckerViewer {
         }
       };
 
+  private final EntrySelecter getSelecter() {
+    switch (getSelectedCondition()) {
+      case 0:
+        return AllEntrySelecter.INSTANCE;
+      case 1:
+        return TargetEntrySelecter.INSTANCE;
+      case 2:
+        return StorageEntrySelecter.INSTANCE;
+      case 3:
+        return PickOneEntrySelecter.INSTANCE;
+      case 4:
+        return (getSelectedFilename() == 0)
+            ? FilenameEntrySelecter.LAST_SELECTER
+            : FilenameEntrySelecter.EARLIEST_SELECTER;
+      case 5:
+        return (getSelectedCompress() == 0)
+            ? CompressEntrySelecter.MAX_SELECTER
+            : CompressEntrySelecter.MIN_SELECTER;
+      case 6:
+        return (getSelectedSize() == 0)
+            ? SizeEntrySelecter.MAX_SELECTER
+            : SizeEntrySelecter.MIN_SELECTER;
+      case 7:
+        return (getSelectedFileSize() == 0)
+            ? FileSizeEntrySelecter.MAX_SELECTER
+            : FileSizeEntrySelecter.MIN_SELECTER;
+      case 8:
+        return (getSelectedLastModified() == 0)
+            ? LastModifiedEntrySelecter.LAST_SELECTER
+            : LastModifiedEntrySelecter.EARLIEST_SELECTER;
+      case 9:
+        return (getSelectedDistanceDir() == 0)
+            ? new LargerDistanceEntrySelecter(distanceSpinner.getSelection())
+            : new SmallerDistanceEntrySelecter(distanceSpinner.getSelection());
+      case 10:
+        return new PathFilterEntrySelecter(pathInput.getPath());
+    }
+    return null;
+  }
+
+  private Set<FileEntry> getSelectedSet(
+      EntrySelecter selecter,
+      List<SimilarGroup> simGroupList,
+      boolean inverse) {
+    Set<FileEntry> selectedSet = selecter.select(simGroupList);
+    if (inverse) {
+      Set<FileEntry> wholeSet = new HashSet<FileEntry>();
+      for (SimilarGroup simGroup : simGroupList) {
+        wholeSet.add(simGroup.getFileEntry());
+        for (SimilarEntry similar : simGroup.getSimilarList()) {
+          wholeSet.add(similar.getFileEntry());
+        }
+      }
+      wholeSet.removeAll(selectedSet);
+      selectedSet = wholeSet;
+    }
+    return selectedSet;
+  }
+
   private final SelectionListener CHECKER_INVOKE_BUTTON_SELECTED =
       new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent event) {
           final List<SimilarGroup> simGroupList =
               frame.getPage(MeasureExecutePage.class).getSimilarGroupList();
-
-          EntrySelecter selecter0 = null;
-          switch (getSelectedCondition()) {
-            case 0:
-              selecter0 = AllEntrySelecter.INSTANCE;
-              break;
-            case 1:
-              selecter0 = TargetEntrySelecter.INSTANCE;
-              break;
-            case 2:
-              selecter0 = StorageEntrySelecter.INSTANCE;
-              break;
-            case 3:
-              selecter0 = PickOneEntrySelecter.INSTANCE;
-              break;
-            case 4:
-              selecter0 =
-                  (getSelectedFilename() == 0)
-                      ? FilenameEntrySelecter.LAST_SELECTER
-                      : FilenameEntrySelecter.EARLIEST_SELECTER;
-              break;
-            case 5:
-              selecter0 =
-                  (getSelectedCompress() == 0)
-                      ? CompressEntrySelecter.MAX_SELECTER
-                      : CompressEntrySelecter.MIN_SELECTER;
-              break;
-            case 6:
-              selecter0 =
-                  (getSelectedSize() == 0)
-                      ? SizeEntrySelecter.MAX_SELECTER
-                      : SizeEntrySelecter.MIN_SELECTER;
-              break;
-            case 7:
-              selecter0 =
-                  (getSelectedFileSize() == 0)
-                      ? FileSizeEntrySelecter.MAX_SELECTER
-                      : FileSizeEntrySelecter.MIN_SELECTER;
-              break;
-            case 8:
-              selecter0 =
-                  (getSelectedLastModified() == 0)
-                      ? LastModifiedEntrySelecter.LAST_SELECTER
-                      : LastModifiedEntrySelecter.EARLIEST_SELECTER;
-              break;
-            case 9:
-              selecter0 =
-                  (getSelectedDistanceDir() == 0)
-                      ? new LargerDistanceEntrySelecter(distanceSpinner.getSelection())
-                      : new SmallerDistanceEntrySelecter(distanceSpinner.getSelection());
-              break;
-            case 10:
-              selecter0 = new PathFilterEntrySelecter(pathInput.getPath());
-              break;
-          }
-          final EntrySelecter selecter = selecter0;
-
+          final EntrySelecter selecter = getSelecter();
           final boolean inverse = inverseCheck.getSelection();
 
           ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -451,20 +482,7 @@ class SimilarEntryCheckerViewer {
           executor.execute(
               new Runnable() {
                 public void run() {
-                  Set<FileEntry> selectedSet0 = selecter.select(simGroupList);
-                  if (inverse) {
-                    Set<FileEntry> wholeSet = new HashSet<FileEntry>();
-                    for (SimilarGroup simGroup : simGroupList) {
-                      wholeSet.add(simGroup.getFileEntry());
-                      for (SimilarEntry similar : simGroup.getSimilarList()) {
-                        wholeSet.add(similar.getFileEntry());
-                      }
-                    }
-                    wholeSet.removeAll(selectedSet0);
-                    selectedSet0 = wholeSet;
-                  }
-                  final Set<FileEntry> selectedSet = selectedSet0;
-
+                  final Set<FileEntry> selectedSet = getSelectedSet(selecter, simGroupList, inverse);
                   Display.getDefault()
                       .syncExec(
                           new Runnable() {

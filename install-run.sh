@@ -1,12 +1,13 @@
 #!/bin/bash
-set -x
+set -ex
 
 DIR=distribution/dre-1.0.2-macosx
 BINARY=dre.app.macosx.x64.jar 
 
 build() {
-  ant make-macosx-distribution
-  ant clean
+  # if test -e $DIR/$BINARY; then return; fi
+  ant make-all-distribution
+  # ant clean
 }
 run() {
   cd $DIR
@@ -14,8 +15,5 @@ run() {
   java -d64 -XstartOnFirstThread -jar $BINARY
 }
 
-# if ! test -e $DIR/$BINARY; then
-#   build
-# fi
 build
 run
